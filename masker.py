@@ -21,7 +21,11 @@ class Masker:
         return processed_img
 
     def check_pan_number(self, text):
+
         return len(text) == 10 and text[:5].isalpha() and text[5:9].isdigit() and text[9].isalpha()
+
+        # This will work for samarjit
+        # return len(text) == 10 and text[:5].isalpha() and text[5:9].isdigit() 
 
     def get_image_data(self):
         rgb = cv2.cvtColor(self.image, cv2.COLOR_BGR2RGB)
@@ -60,23 +64,23 @@ class Masker:
             return True, pan_details
 
     def mask_pan_number(self, pan_data, output_file):
-        
         # Find the index of the first character of the PAN number in the OCR output
         pan_char_index = self.image_data['text'].index(pan_data[0])
 
-        # Get the coordinates of the rectangle containing the first 6 digits of the PAN number
+        # Calculate the width for first 6 digits assuming equal width per character
+        char_width = int(self.image_data['width'][pan_char_index] / 5)
+
+        # Adjust the rectangle coordinates to cover only the first 6 digits
         x = self.image_data['left'][pan_char_index]
+        w = char_width * 3
         y = self.image_data['top'][pan_char_index]
-        w = self.image_data['width'][pan_char_index]
         h = self.image_data['height'][pan_char_index]
 
-        # Draw a rectangle to mask the first 6 digits
-        cv2.rectangle(self.image, (x, y), (x + w, y + h), (0, 0, 0), -1)
+        # Draw a rectangle to mask only the first 6 digits
+        cv2.rectangle(self.image, (x, y), (x + w, y + h), (80, 80, 80), -1)
 
         # Write the modified image to the output file
         cv2.imwrite(output_file.name, self.image)
-
-
 
 
 
@@ -89,27 +93,3 @@ class Masker:
             return True
         else:
             return False
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
